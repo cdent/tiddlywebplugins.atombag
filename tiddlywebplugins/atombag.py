@@ -10,11 +10,9 @@ def is_feed(environ, uri):
     """
     response, content = retrieve_remote(uri, method='HEAD')
     content_type = response['content-type']
-    print content_type
     return 'atom+xml' in content_type or 'rss+xml' in content_type
 
 def get_feed(environ, uri):
-    print 'uri', uri
     response, content = retrieve_remote(uri)
     feed = feedparser.parse(content)
     for entry in feed.entries:
@@ -28,10 +26,8 @@ def get_entry(environ, uri, title):
     feed = feedparser.parse(content)
     tiddler = None
     for entry in feed.entries:
-        print 'looking at', entry.title
         if entry.title == title:
             tiddler = Tiddler(entry.title, uri)
-            print dir(entry)
             tiddler.text = entry.content[0].value
             tiddler.type = entry.content[0].type
             return tiddler
@@ -40,7 +36,5 @@ def get_entry(environ, uri, title):
 
 
 def init(config):
-    print 'calling init in atombag'
     config['remotebag.remote_handlers'].append(
             (is_feed, (get_feed, get_entry)))
-    print 'did some config'
